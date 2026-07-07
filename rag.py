@@ -1,5 +1,7 @@
 from openai import OpenAI
 from pinecone import Pinecone, ServerlessSpec
+import json
+from pathlib import Path
 
 from config import (
     OPENAI_API_KEY,
@@ -9,7 +11,8 @@ from config import (
     PINECONE_METRIC,
     PINECONE_CLOUD,
     PINECONE_REGION,
-    EMBEDDING_MODEL
+    EMBEDDING_MODEL,
+    SQUAD_DATASET,
 )
 
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -69,6 +72,19 @@ def create_embedding(text: str) -> list[float]:
 
     return response.data[0].embedding
 
+"""
+===========================
+DOCUMENT LOADING
+===========================
+"""
+
+def load_documents(file_path: Path) -> dict:
+    """
+    Load the SQuAD dataset from disk.
+    """
+
+    with file_path.open("r", encoding="utf-8") as file:
+        return json.load(file)
 
 """
 ===========================
@@ -91,3 +107,8 @@ def test_connections():
     embedding = create_embedding("Hello world")
 
     print(f"✓ Embedding generated ({len(embedding)} dimensions)")
+
+    dataset = load_documents(SQUAD_DATASET)
+
+    print(f"✓ Dataset loaded successfully.")
+    print(f"Articles: {len(dataset['data'])}")

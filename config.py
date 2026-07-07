@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 
 load_dotenv()
@@ -17,3 +18,10 @@ PINECONE_METRIC = "cosine"
 
 PINECONE_CLOUD = "aws"
 PINECONE_REGION = "us-east-1"
+
+# Project directories
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+
+# Datasets
+SQUAD_DATASET = DATA_DIR / "train-v2.0.json"
