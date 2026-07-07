@@ -8,13 +8,19 @@ from config import (
     PINECONE_DIMENSION,
     PINECONE_METRIC,
     PINECONE_CLOUD,
-    PINECONE_REGION
+    PINECONE_REGION,
+    EMBEDDING_MODEL
 )
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
+"""
+===========================
+PINECONE MANAGEMENT
+===========================
+"""
 
 def create_index():
     """Create the Pinecone index if it doesn't already exist."""
@@ -45,9 +51,35 @@ def connect_index():
 
     return pc.Index(PINECONE_INDEX)
 
+"""
+===========================
+EMBEDDINGS
+===========================
+"""
+
+def create_embedding(text: str) -> list[float]:
+    """
+    Generate an embedding vector using the configured OpenAI embedding model.
+    """
+
+    response = client.embeddings.create(
+        model=EMBEDDING_MODEL,
+        input=text
+    )
+
+    return response.data[0].embedding
+
+
+"""
+===========================
+APPLICATION TESTING
+===========================
+"""
 
 # Connection test to verify that the clients are initialized correctly
 def test_connections():
+    """Verify OpenAI and Pinecone connectivity."""
+
     print("✓ OpenAI client initialized.")
     print("✓ Pinecone client initialized.")
 
@@ -56,3 +88,7 @@ def test_connections():
     index = connect_index()
 
     print(f"✓ Connected to index: {index.describe_index_stats()['dimension']}-D")
+
+    embedding = create_embedding("Hello world")
+
+    print(f"✓ Embedding generated ({len(embedding)} dimensions)")
