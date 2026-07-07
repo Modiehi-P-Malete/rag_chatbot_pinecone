@@ -40,8 +40,19 @@ def create_index():
     print("✓ Index created successfully.")    
     
 
+def connect_index():
+    """Connect to the configured Pinecone index."""
+
+    return pc.Index(PINECONE_INDEX)
+
+
 # Connection test to verify that the clients are initialized correctly
 def test_connections():
     print("✓ OpenAI client initialized.")
     print("✓ Pinecone client initialized.")
+
     create_index()
+
+    index = connect_index()
+
+    print(f"✓ Connected to index: {index.describe_index_stats()['dimension']}-D")
