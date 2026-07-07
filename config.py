@@ -11,3 +11,9 @@ PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE")
 
 EMBEDDING_MODEL = "text-embedding-3-small"
 CHAT_MODEL = "gpt-4o-mini"
+
+PINECONE_DIMENSION = 1536
+PINECONE_METRIC = "cosine"
+
+PINECONE_CLOUD = "aws"
+PINECONE_REGION = "us-east-1"
