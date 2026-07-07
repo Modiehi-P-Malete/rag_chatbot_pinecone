@@ -64,7 +64,7 @@ def create_embedding(text: str) -> list[float]:
 
     response = client.embeddings.create(
         model=EMBEDDING_MODEL,
-        input=text
+        input=text,
     )
 
     return response.data[0].embedding
@@ -76,7 +76,6 @@ APPLICATION TESTING
 ===========================
 """
 
-# Connection test to verify that the clients are initialized correctly
 def test_connections():
     """Verify OpenAI and Pinecone connectivity."""
 
