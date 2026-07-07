@@ -78,13 +78,30 @@ DOCUMENT LOADING
 ===========================
 """
 
-def load_documents(file_path: Path) -> dict:
+def load_documents(file_path: Path) -> list[dict]:
     """
     Load the SQuAD dataset from disk.
     """
 
     with file_path.open("r", encoding="utf-8") as file:
-        return json.load(file)
+        dataset = json.load(file)
+
+    documents = []
+
+    for article in dataset["data"]:
+        title = article["title"]
+
+        for paragraph in article["paragraphs"]:
+            context = paragraph["context"]
+
+            document = {
+                "title": title,
+                "text": context,
+            }
+
+            documents.append(document)
+
+    return documents
 
 """
 ===========================
@@ -108,7 +125,10 @@ def test_connections():
 
     print(f"✓ Embedding generated ({len(embedding)} dimensions)")
 
-    dataset = load_documents(SQUAD_DATASET)
+    documents = load_documents(SQUAD_DATASET)
 
-    print(f"✓ Dataset loaded successfully.")
-    print(f"Articles: {len(dataset['data'])}")
+    print(f"✓ Loaded {len(documents)} documents.")
+
+    print("\nFirst document:")
+
+    print(documents[0])
