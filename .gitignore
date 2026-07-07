@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Ignore local datasets
+data/train-v2.0.json
+
 # C extensions
 *.so
 
