@@ -80,7 +80,7 @@ DOCUMENT LOADING
 
 def load_documents(file_path: Path) -> list[dict]:
     """
-    Load the SQuAD dataset from disk.
+    Load and extract documents from the SQuAD dataset.
     """
 
     with file_path.open("r", encoding="utf-8") as file:
@@ -97,9 +97,16 @@ def load_documents(file_path: Path) -> list[dict]:
             document = {
                 "title": title,
                 "text": context,
+                "metadata": {
+                    "source": "SQuAD",
+                },
             }
 
             documents.append(document)
+
+    
+    for index, document in enumerate(documents):
+        document["id"] = f"doc-{index:06}"
 
     return documents
 
