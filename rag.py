@@ -13,6 +13,7 @@ from config import (
     PINECONE_REGION,
     EMBEDDING_MODEL,
     SQUAD_DATASET,
+    CHAT_MODEL,
 )
 
 client = OpenAI(api_key=OPENAI_API_KEY)
@@ -196,6 +197,45 @@ def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
 
     return results.matches
 
+def chat(query: str) -> str:
+    """
+    Retrieve relevant context and generate an answer.
+    """
+
+    matches = retrieve_context(query)
+
+    context = "\n\n".join(
+        match.metadata["text"] for match in matches
+    )
+
+    prompt = f"""
+You are a helpful AI assistant.
+
+Answer the user's question using ONLY the provided context.
+
+Context:
+{context}
+
+Question:
+{query}
+"""
+
+    response = client.chat.completions.create(
+        model=CHAT_MODEL,
+        messages=[
+            {
+                "role": "system",
+                "content": "You answer questions using retrieved context.",
+            },
+            {
+                "role": "user",
+                "content": prompt,
+            },
+        ],
+    )
+
+    return response.choices[0].message.content
+
 """
 ===========================
 APPLICATION TESTING
@@ -230,11 +270,7 @@ def test_connections():
     print("\nFirst chunk:")
     print(chunks[0])
 
-    matches = retrieve_context("Who is Beyoncé?")
+    answer = chat("Who is Beyoncé?")
 
-    print(f"\nRetrieved {len(matches)} matches:\n")
-
-    for match in matches:
-        print(match.metadata["title"])
-        print(match.metadata["text"][:200])
-        print("-" * 50)
+    print("\nAI Response:\n")
+    print(answer)
