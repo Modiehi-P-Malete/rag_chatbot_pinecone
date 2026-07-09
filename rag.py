@@ -178,6 +178,24 @@ def upsert_chunks(chunks: list[dict]):
     index.upsert(vectors=vectors)
 
     print(f"✓ Uploaded {len(vectors)} vectors to Pinecone.")
+
+def retrieve_context(query: str, top_k: int = 5) -> list[dict]:
+    """
+    Retrieve the most relevant chunks from Pinecone.
+    """
+
+    index = connect_index()
+
+    query_embedding = create_embedding(query)
+
+    results = index.query(
+        vector=query_embedding,
+        top_k=top_k,
+        include_metadata=True,
+    )
+
+    return results.matches
+
 """
 ===========================
 APPLICATION TESTING
@@ -206,8 +224,17 @@ def test_connections():
 
     print(f"✓ Loaded {len(documents)} documents.")
     print(f"✓ Created {len(chunks)} chunks.")
-    
+
     upsert_chunks(chunks[:100])
 
     print("\nFirst chunk:")
     print(chunks[0])
+
+    matches = retrieve_context("Who is Beyoncé?")
+
+    print(f"\nRetrieved {len(matches)} matches:\n")
+
+    for match in matches:
+        print(match.metadata["title"])
+        print(match.metadata["text"][:200])
+        print("-" * 50)
