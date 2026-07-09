@@ -151,6 +151,33 @@ def chunk_documents(
 
     return chunks
 
+def upsert_chunks(chunks: list[dict]):
+    """
+    Generate embeddings for each chunk and upload them to Pinecone.
+    """
+
+    index = connect_index()
+
+    vectors = []
+
+    for chunk in chunks:
+
+        embedding = create_embedding(chunk["text"])
+
+        vectors.append(
+            {
+                "id": chunk["id"],
+                "values": embedding,
+                "metadata": {
+                    **chunk["metadata"],
+                    "title": chunk["title"],
+                    "text": chunk["text"],
+                },
+            }
+        )
+    index.upsert(vectors=vectors)
+
+    print(f"✓ Uploaded {len(vectors)} vectors to Pinecone.")
 """
 ===========================
 APPLICATION TESTING
@@ -179,6 +206,8 @@ def test_connections():
 
     print(f"✓ Loaded {len(documents)} documents.")
     print(f"✓ Created {len(chunks)} chunks.")
+    
+    upsert_chunks(chunks[:100])
 
     print("\nFirst chunk:")
     print(chunks[0])
