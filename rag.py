@@ -112,6 +112,47 @@ def load_documents(file_path: Path) -> list[dict]:
 
 """
 ===========================
+TEXT CHUNKING
+===========================
+"""
+
+def chunk_documents(
+    documents: list[dict],
+    chunk_size: int = 100,
+    overlap: int = 20,
+) -> list[dict]:
+
+    chunks = []
+
+    for document in documents:
+
+        words = document["text"].split()
+
+        start = 0
+        chunk_number = 0
+
+        while start < len(words):
+
+            end = start + chunk_size
+
+            chunk_text = " ".join(words[start:end])
+
+            chunks.append(
+                {
+                    "id": f"{document['id']}-chunk-{chunk_number}",
+                    "title": document["title"],
+                    "text": chunk_text,
+                    "metadata": document["metadata"],
+                }
+            )
+
+            chunk_number += 1
+            start += chunk_size - overlap
+
+    return chunks
+
+"""
+===========================
 APPLICATION TESTING
 ===========================
 """
@@ -134,8 +175,10 @@ def test_connections():
 
     documents = load_documents(SQUAD_DATASET)
 
+    chunks = chunk_documents(documents)
+
     print(f"✓ Loaded {len(documents)} documents.")
+    print(f"✓ Created {len(chunks)} chunks.")
 
-    print("\nFirst document:")
-
-    print(documents[0])
+    print("\nFirst chunk:")
+    print(chunks[0])
